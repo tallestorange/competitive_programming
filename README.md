@@ -1,2 +1,3 @@
-# competitive_programming
-競プロ
+# 競技プログラミング
+
+- AtCoder: [tallestorange](https://atcoder.jp/users/tallestorange)
