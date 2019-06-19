@@ -20,3 +20,16 @@ class UnionFind(object):
       self.parent[a]=b
   def isunited(self,a,b):
     return self.find(a)==self.find(b)
+
+n,m=map(int,input().split())
+uf=UnionFind(n)
+ans=[]
+v=n*(n-1)//2
+l=[tuple(map(int,input().split())) for _ in range(m)][::-1]
+
+for a,b in l:
+  ans.extend([v])
+  if not uf.isunited(a,b):
+    v-=uf.getsize(a)*uf.getsize(b)
+  uf.unite(a,b)
+print(*ans[::-1],sep="\n")
