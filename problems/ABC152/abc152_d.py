@@ -1,13 +1,14 @@
-# 125 521
-# 1234 4531
-# AxxxB ByyyyyyyA
-
-# 1, 1
-# x, x
-
-N = int(input().split())
+N = int(input())
+d = [[0] * 10 for _ in range(10)]
 ans = 0
 
 for n in range(1, N+1):
-    a, b = str(n)[0], str(n)[-1]
-    #10*b+a
+    s = str(n)
+    a, b = int(s[0]), int(s[-1])
+    d[a][b] += 1
+
+for i in range(10):
+    for j in range(10):
+        ans += d[i][j] * d[j][i]
+
+print(ans)
