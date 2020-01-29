@@ -12,12 +12,12 @@ for i in range(1,N+1):
  
 comb = lambda a,b:(fac[a]*rev[a-b]*rev[b])%mod
 
-maxX, minX = 0, 0
+maxA, minA = 0, 0
 
 for i in range(N-K+1):
-    minX += A[i]*comb(N-i-1, K-1)
+    minA += A[i]*comb(N-i-1, K-1)
 
 for j in range(K-1, N):
-    maxX += A[j]*comb(j, K-1)
+    maxA += A[j]*comb(j, K-1)
 
-print((maxX-minX)%mod)
+print((maxA-minA)%mod)
