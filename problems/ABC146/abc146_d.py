@@ -35,6 +35,7 @@ while q:
             color_num+=1 # 根の値とかぶらないようにする
         parent[i] = color_num
         res[(p,i)] = color_num
+        res[(i,p)] = color_num
         q.append(i)
     max_n = max(max_n, color_num)
 
