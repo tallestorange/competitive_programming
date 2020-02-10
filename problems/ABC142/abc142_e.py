@@ -1,20 +1,18 @@
 N, M = map(int, input().split())
 
 l = []
-ans = 0
 for _ in range(M):
-    a, b = map(int ,input().split())
-    c = set(map(int ,input().split()))
-    l.append([a/b, a, c])
-l.sort(reverse=True)
+    a, b = map(int, input().split())
+    c = tuple(map(int, input().split()))
+    l.append((a, c))
 
-selected = set()
-inf = 10**8
-while l and len(selected)!=N:
-    perf, cost, treasures = l.pop()
-    selected|=treasures
-    ans += cost
-    l = [i for i in l if i[2]&treasures!=i[2]]
-    l.sort(reverse=True)
+inf = 10**12
+dp = [inf]*(2**N)
+dp[0] = 0
 
-print(ans if selected == set(range(1, N+1)) else -1)
+for i in range(2**N):
+    for cost, j in l:
+        v = sum(map(lambda x:2**(x-1), j))
+        dp[i|v] = min(dp[i|v], dp[i]+cost)
+
+print(dp[2**N-1] if dp[2**N-1]!=inf else -1)
