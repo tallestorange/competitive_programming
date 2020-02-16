@@ -1,27 +1,17 @@
-from collections import defaultdict
+from collections import deque
 from bisect import bisect_left
 
 N = int(input())
-d = defaultdict(list)
+d = deque([])
+l = [int(input()) for _ in range(N)]
 
-for i in range(N):
-    v = int(input())
-    d[v].append(i)
+d.append(l[0])
 
-keys = sorted(d.keys())
-s = d[keys[0]]
+for i in l[1:]:
+    v = bisect_left(d, i)
+    if v == 0:
+        d.appendleft(i)
+    else:
+        d[v-1] = i
 
-for k in keys[1:]:
-    used = set()
-    for i in d[k]:
-        j = bisect_left(s, i)
-        if 0<j<=len(s):
-            if not s[j-1] in used:
-                s[j-1] = i
-            else:
-                s = s[:j] + [i] + s[j:]
-        elif j==0:
-            s = [i]+s
-        used |= {i}
-
-print(len(s))
+print(len(d))
