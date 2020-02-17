@@ -15,16 +15,24 @@ candidates.sort()
 
 ans = 0
 for d in candidates:
-    m = [i%d for i in A if i%d]
-    m.sort()
-    modsum = sum(m)
-    
+    rems = []
+    rems_size, rems_sum = 0, 0
+
+    for i in A:
+        if i%d:
+            rems.append(i%d)
+            rems_size += 1
+            rems_sum += i%d
+
+    rems.sort()
+
     a = 0
-    for i, j in enumerate(m[:-1], start=1):
+    for i, j in enumerate(rems[:-1], start=1):
         a += j
-        b = d*(N-i)-(modsum-a)
-        print(a, b, d)
-        if a==b and a<=K:
+        b = d*(rems_size-i)-(rems_sum-a)
+        if max(a, b)<=K:
             ans = max(ans, d)
+    if not rems:
+        ans = max(ans, d)
 
 print(ans)
