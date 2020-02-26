@@ -1,18 +1,19 @@
-from itertools import accumulate
-
 N = int(input())
-A = [int(input()) for _ in range(N)]+[10**15]
-bef = 0
-l = [0]*(N+2)
+A = [int(input()) for _ in range(N)][::-1]
 
-for i,j in enumerate(A):
-    if j!=bef:
-        l[i] += 1
-        if bef>=2:
-            l[i-1] -= 1
-            if j==0:
-                l[i] -= 1
-    bef = j
-
-*p, = accumulate(l)
-print(sum(p[:N]))
+if A[-1]:
+    print(-1)
+else:
+    bef = A[0]
+    c, ans = 0, 0
+    for i in A:
+        if bef!=i:
+            if bef-i > 1:
+                ans = -1
+                break
+            ans += bef*c
+            c = 1 if bef<i else 0
+        else:
+            c += 1
+        bef = i
+    print(ans)
