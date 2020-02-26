@@ -9,10 +9,12 @@ def factorize(n):
             n //= i
         if not n:
             break
+    if n>1:
+        d[n] += 1
     return d
 
 d = factorize(P)
 ans = 1
 for i, j in d.items():
     ans *= (i ** (j//N))
-print(ans if N!=1 else P)
+print(ans)
