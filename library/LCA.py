@@ -8,62 +8,69 @@ class SegTree():
         self.inf = INF
 
         N = len(l)
-        v = 1
-        while v<N:
-            v *= 2
-
-        self.size = v
+        self.size = N
         self.node = [self.inf] * (2*self.size-1)
         for i in range(N): # 最下段を埋める
             self.node[i+self.size-1] = l[i]
         for i in range(self.size-1)[::-1]:
             self.node[i] = min(self.node[2*i+1], self.node[2*i+2]) # 上段の更新をする
+    
+    def update(self, k, x):
+        k += self.size-1
+        self.node[k] = x
+        while k >= 0:
+            k = (k - 1) // 2
+            self.node[k] = min(self.node[2*k+1], self.node[2*k+2])
 
-    def get(self, left, right, k=0, l=0, r=-1):
-        if r < 0:
-            r = self.size
+    def get(self, l, r):
+        x = self.inf
+        l += self.size
+        r += self.size
 
-        if (r <= left or right <= l):
-            return self.inf
-        if (left <= l and r <= right):
-            return self.node[k]
-
-        vl = self.get(left, right, 2*k+1, l, (l+r)//2)
-        vr = self.get(left, right, 2*k+2, (l+r)//2, r)
-        return min(vl, vr)
-
-    def update(self, x, v):
-        x += self.size-1
-        self.node[x] = v
-
-        while x>0:
-            x = (x-1)//2
-            self.node[x] = min(self.node[2*x+1], self.node[2*x+2])
+        while l<r:
+            if l&1:
+                x = min(x, self.node[l-1])
+                l += 1
+            if r&1:
+                r -= 1
+                x = min(x, self.node[r-1])
+            l >>= 1
+            r >>= 1
+        return x
 
 
 class LCA():
     def __init__(self, N, G):
-        self.depth = [0] * (N+1)
-        self.euler_tour = []
-        self.G = G
-    
+        self.depth = {}
+        self.tour = []    
         self.idx = {}
-        self._currentIndex = 0
+        self.tree = SegTree(self.euler_tour(G, N, 1), (2**31-1, 2**31-1))
 
-        self._dfs(0, 0, 0)
-        self.tree = SegTree(self.euler_tour, (2**31-1, 2**31-1))
+    def euler_tour(self, G, N, root):
+        q, q2 = [(root, 0)], []
+        visited = [0] * (N+1)
+        cnt = 0
+        et = []
+
+        while q:
+            u, d = q.pop()
+            et += [(d, u)]
+            self.idx[u] = cnt
+            cnt += 1
+            self.depth[u] = d
+
+            if visited[u]:
+                continue
+            for v in G[u]:
+                if visited[v]:
+                    q += [(v, self.depth[v])]
+                else:
+                    q2 += [(v, d+1)]
     
-    def _dfs(self, v, p, d):
-        self.euler_tour.append((d, v))
-        self.idx[v] = self._currentIndex
-        self._currentIndex += 1
-
-        self.depth[v] = d
-        for u in self.G[v]:
-            if u==p:continue
-            self._dfs(u, v, d+1)
-            self.euler_tour.append((d, v))
-            self._currentIndex += 1
+            q.extend(q2)
+            q2 = []
+            visited[u] = 1
+        return et
     
     def get(self, u, v):
         a, b = self.idx[u], self.idx[v]
@@ -72,15 +79,17 @@ class LCA():
 
 
 if __name__ == "__main__":
-    n = int(input())
-    G = {i:[] for i in range(n)}
-    for i in range(n):
-        k, *l = map(int, input().split())
-        G[i] = l
-        for j in l:
-            G[j].append(i)
-    lca = LCA(n, G)
-    q = int(input())
-    for _ in range(q):
+    N = int(input())
+    G = {i:[] for i in range(1, N+1)}
+    for _ in range(N-1):
         u, v = map(int, input().split())
-        print(lca.get(u, v))
+        G[u].append(v)
+        G[v].append(u)
+    
+    lca = LCA(N, G)
+    Q = int(input())
+    for _ in range(Q):
+        a, b = map(int, input().split())
+        c = lca.get(a, b)
+        ans = lca.depth[a]+lca.depth[b]-2*lca.depth[c]+1
+        print(ans)

@@ -1,33 +1,34 @@
-from collections import defaultdict
+from collections import defaultdict, deque, Counter
 
-euler_tour = []
-n = 5
-depth = [0]*(n+1)
 G = defaultdict(list)
 
-def dfs(v, p, d):
-    euler_tour.append(v)
-    depth[v] = d
-    for u in G[v]:
-        if u==p:continue
-        dfs(u, v, d+1)
-        euler_tour.append(v)
+def euler_tour(G, N, root):
+    euler = []
+    q, q2 = [(root, 0)], []
+    visited = [0] * (N+1)
+    depth = {}
+    idx = {}
+    cnt = 0
 
-def lca(u, v):
-    # O(n)
-    a, b = euler_tour.index(u), euler_tour.index(v)
-    a, b = (a, b) if a<b else (b, a)
-    cost = 10**20
-    ans = 0
+    while q:
+        u, d = q.pop()
+        euler += [(u, d)]
+        idx[u] = cnt
+        cnt += 1
+        depth[u] = d
 
-    for i in range(a, b+1):
-        p = euler_tour[i]
-        d = depth[p]
-        if cost > d:
-            ans = p
-            cost = d
-    
-    return ans
+        if visited[u]:
+            continue
+        for v in G[u]:
+            if visited[v]:
+                q += [(v, depth[v])]
+            else:
+                q2 += [(v, d+1)]
+   
+        q.extend(q2)
+        q2 = []
+        visited[u] = 1
+    return euler, idx
 
 
 if __name__ == "__main__":
@@ -42,10 +43,4 @@ if __name__ == "__main__":
         G[u].append(v)
         G[v].append(u)
     
-    dfs(1, 0, 0)
-
-    idx = {i:-1 for i in range(1, n+1)}
-    for i,j in enumerate(euler_tour):
-        idx[j] = i
-    
-    r = [depth[i] for i in euler_tour]
+    et, idx = euler_tour(G, 5, 1)
