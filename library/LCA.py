@@ -1,5 +1,7 @@
 import sys
 sys.setrecursionlimit(1000000)
+input=sys.stdin.readline
+
 
 class SegTree():
     def __init__(self, l, INF):
@@ -44,21 +46,24 @@ class LCA():
         self.depth = [0] * (N+1)
         self.euler_tour = []
         self.G = G
-        self._dfs(0, 0, 0)
+    
+        self.idx = {}
+        self._currentIndex = 0
 
-        self.idx = {i:-1 for i in range(1, N+1)}
-        for i,j in enumerate(self.euler_tour):
-            self.idx[j[1]] = i
-        
+        self._dfs(0, 0, 0)
         self.tree = SegTree(self.euler_tour, (2**31-1, 2**31-1))
     
     def _dfs(self, v, p, d):
         self.euler_tour.append((d, v))
+        self.idx[v] = self._currentIndex
+        self._currentIndex += 1
+
         self.depth[v] = d
         for u in self.G[v]:
             if u==p:continue
             self._dfs(u, v, d+1)
             self.euler_tour.append((d, v))
+            self._currentIndex += 1
     
     def get(self, u, v):
         a, b = self.idx[u], self.idx[v]
