@@ -1,41 +1,51 @@
+from operator import add
+
+
 class SegTree():
-    def __init__(self, l, INF):
-        self.inf = INF
+    def __init__(self, N, e, operator_func=add):
+        self.e = e # 単位元
+        self.size = N
+        self.node = [self.e] * (2*N)
+        self.operator_func = operator_func # 処理(add or xor max minなど)
 
-        N = len(l)
-        v = 1
-        while v<N:
-            v *= 2
-
-        self.size = v
-        self.node = [self.inf] * (2*self.size-1)
-        for i in range(N): # 最下段を埋める
+    def set_list(self, l):
+        for i in range(self.size):
             self.node[i+self.size-1] = l[i]
         for i in range(self.size-1)[::-1]:
-            self.node[i] = self.node[2*i+1] + self.node[2*i+2] # 上段の更新をする
+            self.node[i] = self.operator_func(self.node[2*i+1], self.node[2*i+2])
+    
+    def update(self, k, x):
+        k += self.size-1
+        self.node[k] = x
+        while k >= 0:
+            k = (k - 1) // 2
+            self.node[k] = self.operator_func(self.node[2*k+1], self.node[2*k+2])
 
-    def get(self, left, right, k=0, l=0, r=-1):
-        if r < 0:
-            r = self.size
+    def get(self, l, r):
+        # [l, r) についてqueryを求める
+        x = self.e
+        l += self.size
+        r += self.size
 
-        if (r <= left or right <= l):
-            return self.inf
-        if (left <= l and r <= right):
-            return self.node[k]
-
-        vl = self.get(left, right, 2*k+1, l, (l+r)//2)
-        vr = self.get(left, right, 2*k+2, (l+r)//2, r)
-        return vl + vr
-
-    def update(self, x, v):
-        x += self.size-1
-        self.node[x] = v
-
-        while x>0:
-            x = (x-1)//2
-            self.node[x] = self.node[2*x+1] + self.node[2*x+2]
-
+        while l<r:
+            if l&1:
+                x = self.operator_func(x, self.node[l-1])
+                l += 1
+            if r&1:
+                r -= 1
+                x = self.operator_func(x, self.node[r-1])
+            l >>= 1
+            r >>= 1
+        return x
 
 if __name__ == "__main__":
-    l = [3, 4, 7, 4, 1, 9, 0]
-    tree = SegTree(l, 0)
+    n, q = map(int, input().split())
+    inf = 2**31-1
+    tree = SegTree(n, inf, min)
+
+    for _ in range(q):
+        com, x, y = map(int, input().split())
+        if com:
+            print(tree.get(x, y+1))
+        else:
+            tree.update(x, y)
