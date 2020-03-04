@@ -1,39 +1,41 @@
 import sys
+from operator import add
 sys.setrecursionlimit(1000000)
 input=sys.stdin.readline
 
 
 class SegTree():
-    def __init__(self, l, INF):
-        self.inf = INF
-
-        N = len(l)
+    def __init__(self, N, e, operator_func=add):
+        self.e = e # 単位元
         self.size = N
-        self.node = [self.inf] * (2*self.size-1)
-        for i in range(N): # 最下段を埋める
+        self.node = [self.e] * (2*N)
+        self.operator_func = operator_func # 処理(add or xor max minなど)
+
+    def set_list(self, l):
+        for i in range(self.size):
             self.node[i+self.size-1] = l[i]
         for i in range(self.size-1)[::-1]:
-            self.node[i] = min(self.node[2*i+1], self.node[2*i+2]) # 上段の更新をする
+            self.node[i] = self.operator_func(self.node[2*i+1], self.node[2*i+2])
     
     def update(self, k, x):
         k += self.size-1
         self.node[k] = x
         while k >= 0:
             k = (k - 1) // 2
-            self.node[k] = min(self.node[2*k+1], self.node[2*k+2])
+            self.node[k] = self.operator_func(self.node[2*k+1], self.node[2*k+2])
 
     def get(self, l, r):
-        x = self.inf
+        x = self.e
         l += self.size
         r += self.size
 
         while l<r:
             if l&1:
-                x = min(x, self.node[l-1])
+                x = self.operator_func(x, self.node[l-1])
                 l += 1
             if r&1:
                 r -= 1
-                x = min(x, self.node[r-1])
+                x = self.operator_func(x, self.node[r-1])
             l >>= 1
             r >>= 1
         return x
@@ -44,7 +46,12 @@ class LCA():
         self.depth = {}
         self.tour = []    
         self.idx = {}
-        self.tree = SegTree(self.euler_tour(G, N, 1), (2**31-1, 2**31-1))
+        
+        euler_tour = self.euler_tour(G, N, 1)
+        size = len(euler_tour)
+
+        self.tree = SegTree(size, (2**31-1, 2**31-1), min)
+        self.tree.set_list(euler_tour)
 
     def euler_tour(self, G, N, root):
         q, q2 = [(root, 0)], []
@@ -72,11 +79,14 @@ class LCA():
             visited[u] = 1
         return et
     
-    def get(self, u, v):
+    def get_lca(self, u, v):
         a, b = self.idx[u], self.idx[v]
         a, b = (a, b) if a<b else (b, a)
         return self.tree.get(a, b+1)[1]
-
+    
+    def get_dist(self, u, v):
+        a, b = self.depth[u], self.depth[v]
+        return abs(a-b)
 
 if __name__ == "__main__":
     N = int(input())
@@ -90,6 +100,6 @@ if __name__ == "__main__":
     Q = int(input())
     for _ in range(Q):
         a, b = map(int, input().split())
-        c = lca.get(a, b)
-        ans = lca.depth[a]+lca.depth[b]-2*lca.depth[c]+1
+        c = lca.get_lca(a, b)
+        ans = lca.get_dist(a, c) + lca.get_dist(b, c) + 1
         print(ans)
