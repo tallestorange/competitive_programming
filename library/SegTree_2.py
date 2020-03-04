@@ -26,16 +26,22 @@ class SegTree():
         x = self.e
         l += self.size
         r += self.size
+        a, b = [], []
 
         while l<r:
             if l&1:
-                x = self.operator_func(x, self.node[l-1])
+                a.append(l-1)
                 l += 1
             if r&1:
                 r -= 1
-                x = self.operator_func(x, self.node[r-1])
+                b.append(r-1)
             l >>= 1
             r >>= 1
+
+        # 交換則をみたさないときのために
+        for i in a+(b[::-1]):
+            x = self.operator_func(x, self.node[i])
+
         return x
 
 if __name__ == "__main__":
