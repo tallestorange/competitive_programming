@@ -14,11 +14,7 @@ def check(k):
     a, b = k//2, k%2
     d2 = (a+b)*(v1*T1) + (a)*(v2*T2)
 
-    if d1==0:
-        return True
-    elif d2==0:
-        return True
-    elif (d1<0 and d2>0) or (d1>0 and d2<0):
+    if d1*d2<=0:
         return True
     else:
         return False
