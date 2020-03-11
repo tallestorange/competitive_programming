@@ -1,9 +1,12 @@
 from heapq import heappop, heappush
+import sys
+input = sys.stdin.readline
 
-def dijkstra1(g, source):
+
+def dijkstra1(V, source):
     # O(ElogV)
 
-    n = len(g)
+    n = len(V)
     inf = float("inf")
     dist = [inf] * n
     dist[source] = 0
@@ -20,7 +23,7 @@ def dijkstra1(g, source):
 
     return dist
 
-def dijkstra2(g, source):
+def dijkstra2(V, source):
     # O(V^2)
 
     n = len(V)
@@ -39,15 +42,13 @@ def dijkstra2(g, source):
 
 
 if __name__ == "__main__":
-    n = int(input())
-    V = [[] for _ in range(n)]
+    V, E, r = map(int, input().split())
+    inf = float("inf")
+    costs = {i:[] for i in range(V)}
+    
+    for _ in range(E):
+        s, t, d = map(int, input().split())
+        costs[s].append((d, t))
 
-    for _ in range(n):
-        u, k, *vc = map(int, input().split())
-        for i in range(0, 2*k, 2):
-            v, c = vc[i], vc[i+1]
-            V[u].append((c, v))
-
-    d = dijkstra2(V, 0)
-    for i, j in enumerate(d):
-        print(i, j)
+    for i in dijkstra1(costs, r):
+        print(i if i!=inf else "INF")
