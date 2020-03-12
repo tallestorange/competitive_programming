@@ -42,6 +42,8 @@ for value, idx in l:
     c = tree.lower_bound(v + 1)[0] 
     d = tree.lower_bound(v + 2)[0]
 
+    print(v, a, b, c, d)
+
     tree.add(idx + 1, 1)
     idx += 1
     ans += ((b-a)*(c-idx)+(d-c)*(idx-b)) * value

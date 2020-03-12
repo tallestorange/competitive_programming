@@ -4,13 +4,16 @@
 class SegTree():
     def __init__(self, N, e=0, operator_func=lambda x,y:x+y):
         self.e = e
-        self.size = N
-        self.node = [self.e] * (2*N)
+
+        self.N = N
+        bitlen = (N).bit_length()
+        self.size = 2**(bitlen if N&(N-1) else bitlen-1)
+        self.node = [self.e] * (2*self.size)
         self.op = operator_func
 
     def set_list(self, l):
-        for i in range(self.size):
-            self.node[i+self.size-1] = l[i]
+        for i,j in enumerate(l):
+            self.node[i+self.size-1] = j
         for i in range(self.size-1)[::-1]:
             self.node[i] = self.op(self.node[2*i+1], self.node[2*i+2])
     
@@ -38,16 +41,23 @@ class SegTree():
         return x
 
     def bisect_left(self, x):
-        # O(log^2N)なので遅い
-        left, right = 0, self.size
-        while right-left>1:
-            mid = (left+right)//2
-            v = self.get(0, mid)
-            if v >= x:
-                right = mid
+        if x > self.node[0]:
+            return self.N
+        p, ans = 0, 0
+        node_size = 2 * self.size - 1
+        x -= 1
+
+        while p < node_size:
+            ans = p - (self.size - 1)
+            p1, p2 = 2 * p + 1, 2 * p + 2
+
+            if p1 < node_size and self.node[p1] <= x:
+                x -= self.node[p1]
+                p = p2
             else:
-                left = mid
-        return left+1
+                p = p1
+        
+        return ans
 
 
 if __name__ == "__main__":
@@ -56,18 +66,18 @@ if __name__ == "__main__":
     l = [(j, i) for i, j in enumerate(map(int, input().split()))]
     l.sort(key=lambda x:-x[0])
     tree = SegTree(N)
-
+ 
     ans = 0
-
+ 
     for n, (value, idx) in enumerate(l, start=1):
         v = tree.get(0, idx + 1)
-        a = tree.bisect_left(v - 1) if v > 1 else 0
-        b = tree.bisect_left(v - 0) if v else 0
-        c = tree.bisect_left(v + 1) if n-v>1 else N+1
-        d = tree.bisect_left(v + 2) if n-v>2 else N+1
-
+        a = tree.bisect_left(v - 1)+1 if v > 1 else 0
+        b = tree.bisect_left(v - 0)+1 if v else 0
+        c = tree.bisect_left(v + 1)+1 if n-v>1 else N+1
+        d = tree.bisect_left(v + 2)+1 if n-v>2 else N+1
+ 
         tree.update(idx, 1)
         idx += 1
         ans += ((b-a)*(c-idx)+(d-c)*(idx-b)) * value
-
+ 
     print(ans)
