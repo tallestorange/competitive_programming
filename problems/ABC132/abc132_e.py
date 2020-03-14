@@ -1,24 +1,9 @@
-from collections import defaultdict
-from heapq import heappop, heappush
-import sys
-input = sys.stdin.readline
+from heapq import heappush, heappop
 
-N, M = map(int, input().split())
-V = {i:[] for i in range(N)}
-
-for _ in range(M):
-    u, v = map(int, input().split())
-    V[u-1].append((1, v-1))
-
-S, T = map(int, input().split())
-
-
-def dijkstra1(V, source):
+def dijkstra1(V, n, inf, source):
     # O(ElogV)
 
-    n = len(V)
-    inf = float("inf")
-    dist = [inf] * n
+    dist = [inf] * (n+1)
     dist[source] = 0
     q = [(0, source)]
 
@@ -33,20 +18,21 @@ def dijkstra1(V, source):
 
     return dist
 
-a = dijkstra1(V, S-1)
-b = dijkstra1(V, T-1)
 
-st, ts = a[T-1], b[S-1]
+def solve():
+    INF = 10**25
+    N, M = map(int, input().split())
+    V = {i:[] for i in range(1, 3*N+1)}
+    for _ in range(M):
+        u, v = map(int, input().split())
+        V[u].append((1, v+(N)))
+        V[u+(N)].append((1, v+(2*N)))
+        V[u+(2*N)].append((1, v))
 
-if st==0 and ts==0:
-    print(-1)
-elif (st+ts)%3==0 and st%3:
-    print(-1)
-else:
-    p = 0
-    while 1:
-        v = (st+ts)*p+st
-        if v%3==0:
-            print(v//3)
-            break
-        p += 1
+    S, T = map(int, input().split())
+    dist = dijkstra1(V, 3*N, INF, S)[T]
+    print(-1 if dist==INF else dist//3)
+
+
+if __name__ == "__main__":
+    solve()

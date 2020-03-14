@@ -3,12 +3,10 @@ import sys
 input = sys.stdin.readline
 
 
-def dijkstra1(V, source):
+def dijkstra1(V, n, inf, source):
     # O(ElogV)
 
-    n = len(V)
-    inf = float("inf")
-    dist = [inf] * n
+    dist = [inf] * (n+1)
     dist[source] = 0
     q = [(0, source)]
 
