@@ -2,34 +2,17 @@ from collections import deque
 
 N = int(input())
 S = input()
-dp = [[[] for _ in range(N+1)] for _ in range(N+1)]
+dp = [[[[0]*(N+1) for _ in range(N+1)] for _ in range(4)] fpr _ in range(4)]
 
-for l in range(N+1):
-    for r in range(N+1):
-        if l==0 and r==0:continue
-        if not l+r-1<N:continue
-        a, b = [], []
-
-        if dp[l-1][r]:
-            a = dp[l-1][r][1:] if dp[l-1][r][0] == S[l+r-1] else [S[l+r-1]]+dp[l-1][r]
-        else:
-            a = [S[l+r-1]]
-        
-        if dp[l][r-1]:
-            b = dp[l][r-1][:-1] if dp[l][r-1][-1] == S[l+r-1] else dp[l][r-1]+[S[l+r-1]]
-        else:
-            b = [S[l+r-1]]
-
-        if len(a) > len(b):
-            dp[l][r] = b if r else b
-        else:
-            dp[l][r] = a if l else b
-
-ans = N
-for l in range(N+1):
-    for r in range(N+1):
-        if l==0 and r==0:continue
-        if not l+r==N:continue
-        ans = min(ans, len(dp[l][r]))
-
-print(ans)
+for i in range(1, N+1):
+    for j in range(i+1):
+        # for l in range(4):
+        #     for r in range(4):
+        s = S[i-1]
+        if s == "R":
+            dp[i-1][j-2] = dp[i-1][j-1][1]
+            pass
+        elif s == "G":
+            pass
+        elif s == "B":
+            pass
