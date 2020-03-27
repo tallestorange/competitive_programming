@@ -3,29 +3,28 @@ from bisect import bisect_left
 
 N = int(input())
 s = [int(input()) for _ in range(N)]
-zero = 0 in s
 
 c = Counter(s)
+zero = 0 in c.keys()
 n = N
 l = []
 
 bef = 0
+size = 0
 for i,j in sorted(c.items()):
     if i:
         if bef and zero:
             l.append((bef+1, n))
-        elif (not bef) and (not zero):
-            l.append((bef, n))
         elif not zero:
-            l.append((bef+1, n))
+            l.append((bef+int(bef!=0), n))
         bef = i
         n -= j
     else:
         n -= j
         l.append((0, n))
+    size += 1
 l.append((bef+1, 0))
-
-size = len(l)
+size += 1
 
 def check(l, x):
     left, right = -1, size
