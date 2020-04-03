@@ -21,13 +21,11 @@ def dijkstra1(V, n, inf, source):
 
     return dist
 
-def dijkstra2(V, source):
+def dijkstra2(V, n, inf, source):
     # O(V^2)
 
-    n = len(V)
-    inf = float("inf")
-    used = [False] * n
-    dist = [inf] * n
+    used = [False] * (n+1)
+    dist = [inf] * (n+1)
     dist[0] = 0
     
     for _ in range(n):
