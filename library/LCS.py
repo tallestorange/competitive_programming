@@ -1,56 +1,29 @@
-def LCS(s1, s2):
-    l1, l2 = len(s1), len(s2)
-    if l1 == 0 or l2 == 0: return ''
-
-    # memorization of m[l1][l2]
-    m = []
-    for x in range(l1):
-        m.append([0]*(l2))
-
-    # Fill 0th row
-    isSameFound = False
+def get_lcs_table(s1, s2):
+    l1, l2 = len(s1)+1, len(s2)+1
+    dp = [[0]*l2 for _ in range(l1)]
     for i in range(l1):
-        if isSameFound or s1[i] == s2[0]:
-            m[i][0] = 1
-            isSameFound = True
+        for j in range(l2):
+            dp[i][j] = 0 if i==0 or j==0 else dp[i-1][j-1]+1 if s1[i-1]==s2[j-1] else max(dp[i][j-1], dp[i-1][j])
+    return dp
 
-    # Fill 0th column
-    isSameFound = False
-    for j in range(l2):
-        if isSameFound or s2[j] == s1[0]:
-            m[0][j] = 1
-            isSameFound = True
 
-    max_len = 0
-    # m[i][j] stores the maximum length of subsequence of s1[:i+1], s2[:j+1]
-    for i in range(0, l1-1):
-        for j in range(0, l2-1):
-            if s1[i+1] == s2[j+1]:
-                m[i+1][j+1] = m[i][j] + 1
-                max_len = max(m[i][j], max_len)
-            else:
-                m[i+1][j+1] = max(m[i][j+1], m[i+1][j])
-
-    #If you want to know just the length of the lcs, return maxLen.
-    #Here we'll try to print the lcs.
-    lcs_str = []
-    i, j = l1-1, l2-1
-    while i >= 0 and j >= 0:
-        if s1[i] == s2[j]:
-            lcs_str.append(s1[i]) #or s2[j-1]
-            i -= 1
-            j -= 1
+def restore_lcs(s1, s2, dp):
+    x, y = len(s1), len(s2)
+    l = []
+    while x and y:
+        if dp[x][y] == dp[x-1][y]:
+            x -= 1
+        elif dp[x][y] == dp[x][y-1]:
+            y -= 1
         else:
-            if m[i-1][j] > m[i][j-1]:
-                i -= 1
-            else:
-                j -= 1
-
-    return lcs_str[::-1], m
+            x -= 1
+            y -= 1
+            l.append(s1[x])
+    return "".join(l[::-1])
 
 
 if __name__ == "__main__":
-    N, M = map(int, input().split())
-    *S, = map(int, input().split())
-    *T, = map(int, input().split())
-    a, b = LCS(S, T)
+    s = input()
+    t = input()
+    dp = get_lcs_table(s, t)
+    print(restore_lcs(s, t, dp))
