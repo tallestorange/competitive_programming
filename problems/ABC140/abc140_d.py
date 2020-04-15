@@ -1,29 +1,24 @@
-N, K = map(int ,input().split())
-S = input()
+N, K = map(int, input().split())
+S = list(input())
 
+l = []
+bef = ""
+start = 0
+
+for i, s in enumerate(S):
+    if bef=="":
+        start = i
+    elif bef!=s:
+        l.append(i-start)
+        start = i
+    bef = s
+l.append(i-start+1)
+
+size = len(l)
 ans = 0
-for i in range(N-1):
-    if S[i]==S[i-1]:
-        ans += 1
-
-l = 0
-while l<N:
-    a = S[l]
-    r = l+2
-    while r<N:
-        b = S[r]
-        if a!=b and S[r-1]!=b:
-            if r+1<N:
-                if S!=S[r+1]:
-                    l = r - 1
-                    ans += 1
-                    break
-                else:
-                    r += 1
-            else:
-                l = r - 1
-                ans += 1
-                break
-        else:
-            r += 1
-    l += 1
+for i in range(min(2*K+1, size)):
+    ans += l[i]
+ans -= 1
+for i in range(min(2*K+1, size), size):
+    ans += l[i]-1
+print(ans)
